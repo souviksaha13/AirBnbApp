@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,4 +40,11 @@ public class Hotel {
     @Embedded
     private HotelContactInfo contactInfo;
     // the fields will be visible as -> contact_info_address  contact_info_phone_number etc
+
+    @ManyToOne
+    private User owner;
+
+    @OneToMany(mappedBy = "hotel")
+    private List<Room> rooms;
+
 }
