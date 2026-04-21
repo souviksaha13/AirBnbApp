@@ -2,6 +2,7 @@ package com.springboot.projects.AirBnbApp.service.Impl;
 
 import com.springboot.projects.AirBnbApp.dto.HotelDto;
 import com.springboot.projects.AirBnbApp.entity.Hotel;
+import com.springboot.projects.AirBnbApp.entity.Room;
 import com.springboot.projects.AirBnbApp.exception.ResourceNotFoundException;
 import com.springboot.projects.AirBnbApp.repository.HotelRepository;
 import com.springboot.projects.AirBnbApp.service.HotelService;
@@ -17,6 +18,7 @@ public class HotelServiceImpl implements HotelService {
 
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
+    private final InventoryServiceImpl inventoryService;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -57,11 +59,14 @@ public class HotelServiceImpl implements HotelService {
     @Override
     public void deleteHotelById(Long id) {
         log.info("Deleting a Hotel with id: {}", id);
-        boolean exists = hotelRepository.existsById(id);
-        if(!exists) throw new ResourceNotFoundException("No Hotel found with id: " + id);
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: " + id));
 
         hotelRepository.deleteById(id);
         // TODO: When the hotel is deleted then the inventory of that hotel also has to be deleted
+        for(Room room: hotel.getRooms()) {
+            inventoryService.deleteFutureInventories(room);
+        }
+
     }
 
     @Override
@@ -72,7 +77,10 @@ public class HotelServiceImpl implements HotelService {
                 .orElseThrow(() -> new ResourceNotFoundException("No Hotel found with id: " + id));
 
         hotel.setActive(true);
-        // TODO: Create inventory for all this rooms of this hotel
+        // TODO: Assuming we are doing it only once. Need to solve it later
+        for(Room room : hotel.getRooms()) {
+            inventoryService.initializeRoomForAYear(room);
+        }
         hotelRepository.save(hotel);
     }
 }
