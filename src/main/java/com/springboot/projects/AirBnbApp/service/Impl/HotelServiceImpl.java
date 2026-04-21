@@ -5,11 +5,13 @@ import com.springboot.projects.AirBnbApp.entity.Hotel;
 import com.springboot.projects.AirBnbApp.entity.Room;
 import com.springboot.projects.AirBnbApp.exception.ResourceNotFoundException;
 import com.springboot.projects.AirBnbApp.repository.HotelRepository;
+import com.springboot.projects.AirBnbApp.repository.RoomRepository;
 import com.springboot.projects.AirBnbApp.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -19,6 +21,7 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
     private final InventoryServiceImpl inventoryService;
+    private final RoomRepository roomRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -44,7 +47,7 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public HotelDto updateHotelById(Long id, HotelDto hotelDto) {
-        log.info("Getting a Hotel with id: {}", id);
+        log.info("Updating Hotel with id: {}", id);
         Hotel hotel = hotelRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No Hotel found with id: " + id));
@@ -57,15 +60,19 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional
     public void deleteHotelById(Long id) {
         log.info("Deleting a Hotel with id: {}", id);
         Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: " + id));
 
-        hotelRepository.deleteById(id);
-        // TODO: When the hotel is deleted then the inventory of that hotel also has to be deleted
+        // first delete the inventories, then delete the rooms -> then finally we can delete the hotel
         for(Room room: hotel.getRooms()) {
-            inventoryService.deleteFutureInventories(room);
+            // ordering matters a lot here -> inventory has room field -> can't delete room before deleting the inventory. Same with room and hotel
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
         }
+
+        hotelRepository.deleteById(id);
 
     }
 
