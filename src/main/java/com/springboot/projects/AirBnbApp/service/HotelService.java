@@ -1,6 +1,8 @@
 package com.springboot.projects.AirBnbApp.service;
 
 import com.springboot.projects.AirBnbApp.dto.HotelDto;
+import com.springboot.projects.AirBnbApp.dto.HotelInfoDto;
+import org.jspecify.annotations.Nullable;
 
 public interface HotelService {
     HotelDto createNewHotel(HotelDto hotelDto);
@@ -12,4 +14,6 @@ public interface HotelService {
     void deleteHotelById(Long id);
 
     void activateHotel(Long id);
+
+    HotelInfoDto getHotelInfoById(Long hotelId);
 }
