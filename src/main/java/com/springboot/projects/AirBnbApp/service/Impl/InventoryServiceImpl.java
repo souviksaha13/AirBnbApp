@@ -1,11 +1,16 @@
 package com.springboot.projects.AirBnbApp.service.Impl;
 
+import com.springboot.projects.AirBnbApp.dto.HotelDto;
+import com.springboot.projects.AirBnbApp.dto.HotelSearchRequest;
 import com.springboot.projects.AirBnbApp.entity.Inventory;
 import com.springboot.projects.AirBnbApp.entity.Room;
 import com.springboot.projects.AirBnbApp.repository.InventoryRepository;
 import com.springboot.projects.AirBnbApp.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,5 +48,12 @@ public class InventoryServiceImpl implements InventoryService {
     public void deleteFutureInventories(Room room) {
         LocalDate today = LocalDate.now();
         inventoryRepository.deleteByDateAfterAndRoom(today, room);
+    }
+
+    @Override
+    public Page<HotelDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
+        Pageable pageable = PageRequest.of(hotelSearchRequest.getPage(), hotelSearchRequest.getSize());
+        // Criteria for inventory: 1. startDate <= date <= endDate   2. city   3. availability: (totalCount - bookedCount) >= roomsCount
+        return null;
     }
 }
