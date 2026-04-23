@@ -41,10 +41,6 @@ public class Booking {
     @Column(nullable = false)
     private LocalDate checkoutDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookingStatus bookingStatus;
