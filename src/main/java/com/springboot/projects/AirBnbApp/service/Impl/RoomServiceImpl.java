@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,11 +67,16 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
-    public void deleteRoomById(Long roomId) {
+    public void deleteRoomById(Long roomId, Long hotelId) {
         log.info("Deleting the room with ID: {}", roomId);
         Room room = roomRepository
                 .findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("No Room found with id: " + roomId));
+
+        // Check if this roomId belongs to the hotelId
+        if(!Objects.equals(room.getHotel().getId(), hotelId)) {
+            throw new IllegalStateException("This room doesn't belong to the given hotel");
+        }
 
         inventoryService.deleteAllInventories(room);
         roomRepository.deleteById(roomId);

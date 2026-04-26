@@ -48,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
 
         List<Inventory> inventoryList = inventoryRepository.findAndLockAvailableInventory(room.getId(), bookingRequest.getCheckinDate(), bookingRequest.getCheckoutDate(), bookingRequest.getRoomsCount());
 
-        long daysCount = ChronoUnit.DAYS.between(bookingRequest.getCheckinDate(), bookingRequest.getCheckoutDate());
+        long daysCount = ChronoUnit.DAYS.between(bookingRequest.getCheckinDate(), bookingRequest.getCheckoutDate()) + 1;
 
         if(inventoryList.size() != daysCount) {
             throw new IllegalStateException("Room is not available anymore");
