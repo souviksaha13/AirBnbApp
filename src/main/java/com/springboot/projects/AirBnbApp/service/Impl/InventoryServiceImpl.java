@@ -1,10 +1,12 @@
 package com.springboot.projects.AirBnbApp.service.Impl;
 
 import com.springboot.projects.AirBnbApp.dto.HotelDto;
+import com.springboot.projects.AirBnbApp.dto.HotelPriceDto;
 import com.springboot.projects.AirBnbApp.dto.HotelSearchRequest;
 import com.springboot.projects.AirBnbApp.entity.Hotel;
 import com.springboot.projects.AirBnbApp.entity.Inventory;
 import com.springboot.projects.AirBnbApp.entity.Room;
+import com.springboot.projects.AirBnbApp.repository.HotelMinPriceRepository;
 import com.springboot.projects.AirBnbApp.repository.InventoryRepository;
 import com.springboot.projects.AirBnbApp.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final HotelMinPriceRepository hotelMinPriceRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -68,5 +71,23 @@ public class InventoryServiceImpl implements InventoryService {
                 pageable
         );
         return hotelPage.map((element) -> modelMapper.map(element, HotelDto.class));
+    }
+
+    @Override
+    public Page<HotelPriceDto> searchHotels2(HotelSearchRequest hotelSearchRequest) {
+        log.info("Searching hotels for {} city, from {} to {}", hotelSearchRequest.getCity(), hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate());
+        Pageable pageable = PageRequest.of(hotelSearchRequest.getPage(), hotelSearchRequest.getSize());
+        long dateCount = ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate()) + 1;
+
+        Page<HotelPriceDto> hotelPage = hotelMinPriceRepository.findHotelsWithAvailableInventory(
+                hotelSearchRequest.getCity(),
+                hotelSearchRequest.getStartDate(),
+                hotelSearchRequest.getEndDate(),
+                hotelSearchRequest.getRoomsCount(),
+                dateCount,
+                pageable
+        );
+
+        return hotelPage;
     }
 }

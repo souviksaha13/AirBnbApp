@@ -1,5 +1,6 @@
 package com.springboot.projects.AirBnbApp.repository;
 
+import com.springboot.projects.AirBnbApp.dto.HotelPriceDto;
 import com.springboot.projects.AirBnbApp.entity.Hotel;
 import com.springboot.projects.AirBnbApp.entity.HotelMinPrice;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public interface HotelMinPriceRepository extends JpaRepository<HotelMinPrice, Lo
                 AND i.hotel.active = true
             GROUP BY i.hotel
             """)
-    Page<Hotel> findHotelsWithAvailableInventory(
+    Page<HotelPriceDto> findHotelsWithAvailableInventory(
             @Param("city") String city,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,

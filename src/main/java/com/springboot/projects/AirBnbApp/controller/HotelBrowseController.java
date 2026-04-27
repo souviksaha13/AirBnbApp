@@ -2,6 +2,7 @@ package com.springboot.projects.AirBnbApp.controller;
 
 import com.springboot.projects.AirBnbApp.dto.HotelDto;
 import com.springboot.projects.AirBnbApp.dto.HotelInfoDto;
+import com.springboot.projects.AirBnbApp.dto.HotelPriceDto;
 import com.springboot.projects.AirBnbApp.dto.HotelSearchRequest;
 import com.springboot.projects.AirBnbApp.service.HotelService;
 import com.springboot.projects.AirBnbApp.service.InventoryService;
@@ -23,6 +24,12 @@ public class HotelBrowseController {
     @GetMapping("/search")
     public ResponseEntity<Page<HotelDto>> searchHotels(@RequestBody HotelSearchRequest hotelSearchRequest) {
         Page<HotelDto> page = inventoryService.searchHotels(hotelSearchRequest);
+        return ResponseEntity.ok(page);
+    }
+
+    @GetMapping("/search2")
+    public ResponseEntity<Page<HotelPriceDto>> searchHotels2(@RequestBody HotelSearchRequest hotelSearchRequest) {
+        Page<HotelPriceDto> page = inventoryService.searchHotels2(hotelSearchRequest);
         return ResponseEntity.ok(page);
     }
 
