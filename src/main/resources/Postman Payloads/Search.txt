@@ -1,0 +1,14 @@
+// Search a particular hotel
+
+{
+    "city": "Jaipur",
+    "startDate": "2026-05-12",
+    "endDate": "2026-05-15",
+    "roomsCount": 1,
+    "page": 0,
+    "size": 4
+}
+
+
+// Initialise a booking
+
